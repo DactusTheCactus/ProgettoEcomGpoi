@@ -7,6 +7,7 @@
 
   let products: Product[] = [];
   let loading = true;
+  let categories: string[] = [];
 
   onMount(async () => {
     try {
@@ -15,6 +16,7 @@
         id: doc.id,
         ...doc.data()
       } as Product));
+      categories = [...new Set(products.map(p => p.category))];
     } catch (error) {
       console.error('Error fetching products:', error);
     } finally {
@@ -23,135 +25,151 @@
   });
 
   function addToCart(product: Product) {
-    cartStore.update(items => [...items, product]);
+    cartStore.update(items => {
+      const existingItem = items.find(item => item.id === product.id);
+      if (!existingItem) {
+        return [...items, { ...product, quantity: 1 }];
+      }
+      return items;
+    });
     cartOpen.set(true);
   }
 </script>
 
 <main>
-  <header class="hero">
-    <h1>Anzanation</h1>
-    <p>Sconti stagionali</p>
-  </header>
-
-  {#if loading}
-    <div class="loading">Loading exquisite pieces...</div>
-  {:else}
-    <div class="products">
-      {#each products as product}
-        <div class="product-card">
-          <img src={product.imageUrl} alt={product.name} />
-          <h2>{product.name}</h2>
-          <p class="price">${product.price}</p>
-          <button on:click={() => addToCart(product)}>Add to Cart</button>
-        </div>
-      {/each}
-      }
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Anzanation</h1>
+      <p>Discover the best guns in the US! 🦅🇺🇸🦅</p>
     </div>
-  {/if}
-  }
+  </section>
+
+  <section class="products-section">
+    {#if loading}
+      <div class="loading">Loading our collection...</div>
+    {:else}
+      <div class="filters">
+        <h2>Categories</h2>
+        {#each categories as category}
+          <button class="filter-btn">{category}</button>
+        {/each}
+      </div>
+
+      <div class="products-grid">
+        {#each products as product}
+          <div class="product-card">
+            <div class="product-image">
+              <img src={product.imageUrl} alt={product.name} loading="lazy" />
+            </div>
+            <div class="product-info">
+              <h3>{product.name}</h3>
+              <p class="price">${product.price}</p>
+              <p class="description">{product.description}</p>
+              <button class="add-to-cart" on:click={() => addToCart(product)}>
+                Add to Cart
+              </button>
+            </div>
+          </div>
+        {/each}
+      </div>
+    {/if}
+  </section>
 </main>
 
 <style>
-  main {
-    padding-top: 60px;
-  }
-
   .hero {
-    height: 60vh;
+    height: 70vh;
+    background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('/hero-bg.jpg');
+    background-size: cover;
+    background-position: center;
     display: flex;
-    flex-direction: column;
-    justify-content: center;
     align-items: center;
-    background: linear-gradient(45deg, #1a1a1a, #4a4a4a);
-    color: #fff;
+    justify-content: center;
+    color: white;
     text-align: center;
-    position: relative;
-    overflow: hidden;
   }
 
-  .hero::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.5) 100%);
-    z-index: 1;
-  }
-
-  .hero h1 {
+  .hero-content h1 {
     font-size: 4em;
     margin: 0;
-    z-index: 2;
     text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
   }
 
-  .hero p {
-    font-size: 1.5em;
-    margin-top: 0.5em;
-    z-index: 2;
+  .products-section {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
   }
 
-  .products {
+  .filters {
+    margin-bottom: 2rem;
+  }
+
+  .filter-btn {
+    margin: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: #f3f4f6;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .products-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 2rem;
-    padding: 2rem;
-    max-width: 1200px;
-    margin: 0 auto;
   }
 
   .product-card {
     background: white;
-    border-radius: 15px;
-    padding: 1rem;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    transition: transform 0.3s ease;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease;
   }
 
   .product-card:hover {
-    transform: translateY(-5px);
+    transform: translateY(-4px);
   }
 
-  .product-card img {
+  .product-image img {
     width: 100%;
     height: 300px;
     object-fit: cover;
-    border-radius: 10px;
   }
 
-  .product-card h2 {
-    margin: 1rem 0;
-    font-size: 1.5em;
+  .product-info {
+    padding: 1rem;
   }
 
   .price {
     font-size: 1.25em;
-    color: #666;
-    margin-bottom: 1rem;
+    color: #166534;
+    font-weight: bold;
   }
 
-  button {
+  .add-to-cart {
     width: 100%;
-    padding: 1rem;
-    background: #1a1a1a;
+    padding: 0.75rem;
+    background: #166534;
     color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 4px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: background 0.2s ease;
   }
 
-  button:hover {
-    background: #333;
+  .add-to-cart:hover {
+    background: #15803d;
   }
 
-  .loading {
-    text-align: center;
-    padding: 2rem;
-    font-size: 1.2em;
-    color: #666;
+  @media (max-width: 768px) {
+    .hero-content h1 {
+      font-size: 2.5em;
+    }
+    
+    .products-grid {
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    }
   }
 </style>
