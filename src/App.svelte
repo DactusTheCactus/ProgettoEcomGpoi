@@ -5,7 +5,7 @@
   import { cartOpen } from './lib/stores';
   
   const routes = {
-   Home,
+   '/':Home
   };
 
   function toggleCart() {
@@ -31,22 +31,24 @@
 <Cart />
 
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
+
   :global(body) {  
     margin: 0;
     font-family: 'Playfair Display', serif;
-    background: #fafafa;
-    color: #2c3e50;
+    background-color:#2c3e50;
+    color: #e3eaf0;
   }
 
   nav {
-    background: #ffffff;
-    color: #2c3e50;
+    background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5));
+    color: hsl(61, 87%, 45%);
     padding: 1rem 0;
     position: fixed;
     width: 100%;
-    top: 0;
+    top: 0; 
     z-index: 100;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    /* box-shadow: 0 2px 10px rgba(0,0,0,0.1); */
   }
 
   .container {
@@ -59,23 +61,24 @@
   }
 
   .logo {
+    font-family: "Bebas Neue", sans-serif;
     font-size: 1.8em;
     font-weight: 600;
-    color: #166534;
+    
   }
 
   .cart-button {
     padding: 0.5rem 1rem;
-    background: #166534;
-    color: white;
+    background: hsl(61, 87%, 45%);
+    color: #2c3e50;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    font-family: 'Playfair Display', serif;
+    font-family: Helvetica, serif;
   }
 
   .cart-button:hover {
-    background: #15803d;
+    background: hsl(61, 87%, 47%);
   }
 
   main {

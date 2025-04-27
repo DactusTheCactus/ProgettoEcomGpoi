@@ -62,12 +62,13 @@
 
   .cart {
     width: 450px;
-    background: white;
+    background-color:#2c3e50;
     height: 100%;
     padding: 2rem;
     position: relative;
     overflow-y: auto;
     box-shadow: -2px 0 20px rgba(0,0,0,0.1);
+    
   }
 
   .close-btn {
@@ -82,9 +83,11 @@
   }
 
   .cart h2 {
-    color: #166534;
+    color: rgb(247, 255, 5);
+    background-color:#2c3e50;
     font-size: 1.8em;
     margin-bottom: 2rem;
+    font-family: Helvetica;
   }
 
   .cart-items {
@@ -96,7 +99,7 @@
     align-items: center;
     padding: 1rem;
     margin-bottom: 1rem;
-    background: #f8fafc;
+    background-color:#2c3e50;
     border-radius: 12px;
     transition: transform 0.2s ease;
   }
@@ -151,7 +154,7 @@
   }
 
   .checkout-btn {
-    background: #166534;
+    background: #e3e611;
     color: white;
     padding: 1rem 2rem;
     border: none;
@@ -164,6 +167,6 @@
   }
 
   .checkout-btn:hover {
-    background: #15803d;
+    background: #e3e611;
   }
 </style>

@@ -79,7 +79,7 @@
 <style>
   .hero {
     height: 70vh;
-    background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('/hero-bg.jpg');
+    background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('../assets/RAtto.jpeg');
     background-size: cover;
     background-position: center;
     display: flex;
