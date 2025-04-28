@@ -8,6 +8,8 @@
   let products: Product[] = [];
   let loading = true;
   let categories: string[] = [];
+  const API_URL = 'http://localhost:3001';
+
 
   onMount(async () => {
     try {
