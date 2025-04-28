@@ -1,5 +1,3 @@
-Certamente! Ecco la traduzione in italiano del tuo README:
-
 # GpoiEcomBackend
 
 ## Panoramica
@@ -32,16 +30,7 @@ GpoiEcomBackend è un'applicazione backend basata su Node.js e sviluppata con Ty
    npm install
    ```
 
-3. Crea un file .env nella directory principale e aggiungi le seguenti variabili d'ambiente:
-   ```env
-   FIREBASE_PROJECT_ID=<il-tuo-id-progetto-firebase>
-   FIREBASE_CLIENT_EMAIL=<la-tua-email-client-firebase>
-   FIREBASE_PRIVATE_KEY=<la-tua-chiave-privata-firebase>
-   FIREBASE_DATABASE_URL=<l-url-del-tuo-database-firebase>
-   PORT=3001
-   ```
-
-4. Installa TypeScript e le definizioni dei tipi per lo sviluppo:
+3. Installa TypeScript e le definizioni dei tipi per lo sviluppo:
    ```bash
    npm install --save-dev typescript @types/node @types/express @types/cors
    ```
