@@ -10,16 +10,54 @@
 
 
   onMount(async () => {
-    try {
-      products = await fetch(`${API_URL}/api/products/`).then(res => res.json());
-      // Fetch products from Firestore
-    } catch (error) {
-      console.error('Error fetching products:', error);
-    } finally {
-      loading = false;
+  try {
+    const response = await fetch(`${API_URL}/api/products/`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
-  });
+    const data = await response.json();
+    
+    // log
+    console.log('Received data:', data);
 
+    // Validazione array
+    if (!Array.isArray(data)) {
+      throw new Error('Received data is not an array');
+    }
+
+    // mappa
+    products = data.map((item: any) => {
+      if (!item || typeof item !== 'object') {
+        console.error('Invalid product item:', item);
+        return null;
+      }
+
+      // Validate required fields
+      const product = {
+        id: item.id?.toString() || crypto.randomUUID(),
+        name: item.name || 'Unnamed Product',
+        price: Number(item.price) || 0,
+        description: item.description || 'No description available',
+        imageUrl: item.imageUrl || 'https://placehold.co/600x400/222/gold?text=Product+Image',
+        category: item.category || 'Uncategorized'
+      };
+
+      return product;
+    }).filter(product => product !== null); // Remove any null products
+
+    // Extract unique categories from valid products
+    categories = [...new Set(products.map(product => product.category))];
+    
+    console.log('Processed products:', products);
+    
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    products = [];
+    categories = [];
+  } finally {
+    loading = false;
+  }
+});
   function addToCart(product: Product) {
     cartStore.update(items => {
       const existingItem = items.find(item => item.id === product.id);
@@ -55,7 +93,7 @@ let randomQuote = streetQuotes[Math.floor(Math.random() * streetQuotes.length)];
   <section class="about-us">
     <h2 class="section-title">Di più sulla Dinastia</h2>
     <div class="about-content">
-      <p> Nato nelle strade, elevato al lusso. Anzanation rappresenta la perfetta fusione tra autenticità grezza e qualità premium. Non vendiamo solo prodotti, curiamo esperienze per coloro che osano distinguersi.</p>
+      <p>Nato nelle strade, elevato al lusso. Anzanation rappresenta la perfetta fusione tra autenticità grezza e qualità premium. Non vendiamo solo prodotti, curiamo esperienze per coloro che osano distinguersi.</p>
       <div class="stats">
         <div class="stat">
           <span class="stat-number">5K+</span>
@@ -64,10 +102,6 @@ let randomQuote = streetQuotes[Math.floor(Math.random() * streetQuotes.length)];
         <div class="stat">
           <span class="stat-number">100%</span>
           <span class="stat-label">Authentic</span>
-        </div>
-        <div class="stat">
-          <span class="stat-number">24/7</span>
-          <span class="stat-label">Excellence</span>
         </div>
       </div>
     </div>
@@ -90,17 +124,22 @@ let randomQuote = streetQuotes[Math.floor(Math.random() * streetQuotes.length)];
         {#each products as product}
           <div class="product-card">
             <div class="product-image">
-              <img src={product.imageUrl} alt={product.name} loading="lazy" />
-              <div class="product-overlay">
-                <button class="add-to-cart" on:click={() => addToCart(product)}>
-                  Add to Collection
-                </button>
-              </div>
+              <img
+                src={product.imageUrl}
+                alt={product.name}
+                loading="lazy"
+                on:error={(e) => {
+                  e.currentTarget.src = 'https://placehold.co/600x400/222/gold?text=Image+Not+Found';
+                }}
+              />
             </div>
             <div class="product-info">
               <h3>{product.name}</h3>
               <p class="price">${product.price}</p>
               <p class="description">{product.description}</p>
+              <button class="add-to-cart" on:click={() => addToCart(product)}>
+                Add to Collection
+              </button>
             </div>
           </div>
         {/each}
@@ -235,52 +274,86 @@ let randomQuote = streetQuotes[Math.floor(Math.random() * streetQuotes.length)];
     color: #000000;
   }
 
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 2rem;
+    padding: 2rem 0;
+  }
+
   .product-card {
     background: #1a1a1a;
     border: 1px solid #333;
-    position: relative;
+    border-radius: 4px;
     overflow: hidden;
+    transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .product-card:hover {
+    transform: translateY(-5px);
   }
 
   .product-image {
-    position: relative;
-  }
-
-  .product-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0,0,0,0.7);
+    width: 100%;
+    height: 280px;
+    overflow: hidden;
+    background-color: #1a1a1a;
     display: flex;
     align-items: center;
     justify-content: center;
-    opacity: 0;
-    transition: opacity 0.3s ease;
   }
 
-  .product-card:hover .product-overlay {
-    opacity: 1;
+  .product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
   }
 
-  .add-to-cart {
-    background: #ffd700;
-    color: #000000;
-    border: none;
-    padding: 1rem 2rem;
-    font-weight: bold;
-    transform: translateY(20px);
-    transition: all 0.3s ease;
+  .product-info {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
   }
 
-  .product-card:hover .add-to-cart {
-    transform: translateY(0);
+  .product-info h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.2em;
+    color: #ffffff;
   }
 
   .price {
     color: #ffd700;
     font-size: 1.5em;
+    margin: 0.5rem 0;
+  }
+
+  .description {
+    color: #888;
+    font-size: 0.9em;
+    margin: 0.5rem 0 1rem 0;
+    flex-grow: 1;
+  }
+
+  .add-to-cart {
+    width: 100%;
+    background: #ffd700;
+    color: #000000;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 2px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: auto;
+  }
+
+  .add-to-cart:hover {
+    background: #ffffff;
+    color: #000000;
   }
 
   @media (max-width: 768px) {
