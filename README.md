@@ -1,28 +1,31 @@
-# GpoiEcomBackend
+# Anzanation E-commerce
 
 ## Panoramica
 
-GpoiEcomBackend è un'applicazione backend basata su Node.js e sviluppata con TypeScript. Utilizza Express.js per la gestione delle richieste HTTP e Firebase Admin SDK per l'autenticazione, il database e l'integrazione con Firestore. L'applicazione è progettata per fornire un backend robusto e scalabile per una piattaforma di e-commerce.
+Anzanation è un'applicazione e-commerce moderna sviluppata con Svelte e TypeScript. Il frontend offre un'esperienza utente elegante e reattiva, mentre il backend è costruito con Node.js e Firebase per gestire autenticazione, database e storage.
 
-## Funzionalità
+## Caratteristiche Frontend
 
-- **Express.js**: Framework web leggero e flessibile per la creazione di API.
-- **Firebase Admin SDK**: Integrazione con Firebase per l'autenticazione, Firestore e Realtime Database.
-- **TypeScript**: Linguaggio fortemente tipizzato per una migliore qualità e manutenibilità del codice.
-- **Configurazione dell'Ambiente**: Utilizza il file .env per la gestione di credenziali sensibili e configurazioni.
+- **Svelte**: Framework reattivo per un'interfaccia utente performante e fluida
+- **TypeScript**: Tipizzazione statica per uno sviluppo più robusto
+- **Vite**: Build tool moderno per uno sviluppo veloce
+- **Firebase Integration**: Autenticazione utenti e gestione dati in tempo reale
+- **Responsive Design**: Interfaccia adattiva con animazioni fluide
+- **Cart System**: Gestione del carrello con stato persistente
+- **Routing**: Navigazione SPA con svelte-spa-router
 
 ## Prerequisiti
 
-- **Node.js**: Assicurati di avere Node.js installato (versione 14 o successiva raccomandata).
-- **npm**: Incluso con Node.js per la gestione delle dipendenze.
-- **Progetto Firebase**: Un progetto Firebase con le credenziali necessarie.
+- **Node.js**: Versione 14 o successiva
+- **npm**: Package manager per Node.js
+- **Progetto Firebase**: Credenziali Firebase per autenticazione e database
 
 ## Installazione
 
 1. Clona il repository:
    ```bash
    git clone <repository-url>
-   cd GpoiEcomBackend
+   cd ProgettoEcomGpoi
    ```
 
 2. Installa le dipendenze:
@@ -30,56 +33,57 @@ GpoiEcomBackend è un'applicazione backend basata su Node.js e sviluppata con Ty
    npm install
    ```
 
-3. Installa TypeScript e le definizioni dei tipi per lo sviluppo:
-   ```bash
-   npm install --save-dev typescript @types/node @types/express @types/cors
-   ```
+3. Configura Firebase:
+   - Crea un progetto Firebase
+   - Copia le credenziali nel file `src/lib/firebase.ts`
 
-## Esecuzione dell'Applicazione
+## Sviluppo
 
-1. Compila ed esegui l'applicazione:
-   ```bash
-   npx ts-node src/index.ts
-   ```
+Avvia il server di sviluppo:
+```bash
+npm run dev
+```
 
-2. Il backend verrà avviato sulla porta specificata nel file .env (predefinito: `3001`).
+L'applicazione sarà disponibile su `http://localhost:5173`
 
 ## Struttura del Progetto
 
 ```
-GpoiEcomBackend/
+ProgettoEcomGpoi/
 ├── src/
-│   └── index.ts        # Punto di ingresso principale dell'applicazione
-├── .env                # Variabili d'ambiente
-├── package.json        # Dipendenze e script del progetto
-├── tsconfig.json       # Configurazione di TypeScript
+│   ├── lib/           # Componenti e utilities condivisi
+│   │   ├── Auth.svelte    # Componente autenticazione
+│   │   ├── Cart.svelte    # Componente carrello
+│   │   ├── firebase.ts    # Configurazione Firebase
+│   │   └── stores.ts      # Store Svelte
+│   ├── routes/        # Componenti pagina
+│   │   └── Home.svelte    # Homepage
+│   ├── App.svelte     # Componente root
+│   └── main.ts        # Entry point
+├── public/            # Asset statici
+├── index.html         # HTML template
+└── vite.config.ts     # Configurazione Vite
 ```
 
-## Endpoint API
+## Scripts
 
-### Middleware
+- `npm run dev`: Avvia il server di sviluppo
+- `npm run build`: Compila l'applicazione per la produzione
+- `npm run preview`: Anteprima della build di produzione
+- `npm run check`: Verifica i tipi TypeScript
 
-- **`verifyFirebaseToken`**: Middleware per verificare i token di autenticazione Firebase.
+## Backend Integration
 
-### Esempi di Route
+Il frontend comunica con un backend Node.js/Express che:
+- Gestisce le richieste API per i prodotti
+- Integra Firebase Admin SDK
+- Gestisce autenticazione e autorizzazione
+- Fornisce endpoints RESTful
 
-- **`GET /`**: Placeholder per l'endpoint principale.
-- **`POST /example`**: Endpoint di esempio per la gestione delle richieste POST.
-
-## Sviluppo
-
-### Configurazione di TypeScript
-
-Il file tsconfig.json è configurato con le seguenti opzioni:
-- `esModuleInterop`: Abilita la compatibilità con i moduli CommonJS.
-- `strict`: Applica regole di controllo dei tipi rigorose.
-
-### Linting e Formattazione
-
-Installa ESLint e Prettier per la qualità e la formattazione del codice:
-```bash
-npm install --save-dev eslint prettier
-```
+L'API backend è configurata per girare sulla porta 3001 ed espone endpoints per:
+- Gestione prodotti
+- Autenticazione utenti
+- Gestione ordini
 
 ## Deploy
 
@@ -88,9 +92,20 @@ npm install --save-dev eslint prettier
    npm run build
    ```
 
-2. Distribuisci i file JavaScript compilati sul tuo server o piattaforma cloud.
+2. I file compilati saranno nella cartella `dist/`
 
-## Risoluzione dei Problemi
+3. Distribuisci i file su un servizio di hosting statico (es. Firebase Hosting, Vercel, Netlify)
 
-- **Definizioni dei Tipi Mancanti**: Installa le definizioni dei tipi mancanti usando `npm install --save-dev @types/<nome-modulo>`.
-- **Errori di Firebase**: Assicurati che il file .env contenga credenziali Firebase valide.
+## Risoluzione Problemi
+
+- **Errori TypeScript**: Verifica che tutte le definizioni dei tipi siano corrette
+- **Problemi Firebase**: Controlla le credenziali e le regole di sicurezza
+- **Errori di Build**: Assicurati che tutte le dipendenze siano installate correttamente
+
+## Contributing
+
+1. Fork il repository
+2. Crea un branch per la feature (`git checkout -b feature/AmazingFeature`)
+3. Commit i cambiamenti (`git commit -m 'Add some AmazingFeature'`)
+4. Push al branch (`git push origin feature/AmazingFeature`)
+5. Apri una Pull Request
