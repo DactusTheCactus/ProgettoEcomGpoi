@@ -1,7 +1,5 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { db } from '../lib/firebase';
-  import { collection, getDocs } from 'firebase/firestore';
   import type { Product } from '../lib/types';
   import { cartStore, cartOpen } from '../lib/stores';
 
@@ -13,12 +11,8 @@
 
   onMount(async () => {
     try {
-      const querySnapshot = await getDocs(collection(db, 'products'));
-      products = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      } as Product));
-      categories = [...new Set(products.map(p => p.category))];
+      products = await fetch(`${API_URL}/api/products/`).then(res => res.json());
+      // Fetch products from Firestore
     } catch (error) {
       console.error('Error fetching products:', error);
     } finally {
@@ -38,8 +32,8 @@
   }
 // Add random quotes
 const streetQuotes = [
-  "Streets talk, we listen 🗣️",
-  "Born royal, living loyal 👑",
+  "Everyday sto con i miei🗣️",
+  "Everyday sono anzalone 👑",
   "Power moves only 💯",
   "Trust the process 🏆",
   "Elite mindset, elite results 💫"
@@ -53,19 +47,19 @@ let randomQuote = streetQuotes[Math.floor(Math.random() * streetQuotes.length)];
     <div class="hero-content">
       <div class="brand-tag">EST. 2024</div>
       <h1>Anzanation</h1>
-      <p class="hero-subtitle">Discover the best guns in the US! 🦅🇺🇸🦅</p>
+      <p class="hero-subtitle">Anzanation: Lusso audace per chi traccia la propria strada.</p>
       <div class="street-quote">{randomQuote}</div>
     </div>
   </section>
 
   <section class="about-us">
-    <h2 class="section-title">About The Dynasty</h2>
+    <h2 class="section-title">Di più sulla Dinastia</h2>
     <div class="about-content">
-      <p>Born in the streets, elevated to luxury. Anzanation represents the perfect blend of raw authenticity and premium quality. We don't just sell products - we curate experiences for those who dare to stand out.</p>
+      <p> Nato nelle strade, elevato al lusso. Anzanation rappresenta la perfetta fusione tra autenticità grezza e qualità premium. Non vendiamo solo prodotti, curiamo esperienze per coloro che osano distinguersi.</p>
       <div class="stats">
         <div class="stat">
           <span class="stat-number">5K+</span>
-          <span class="stat-label">Satisfied Clients</span>
+          <span class="stat-label">Anzanation Lovers</span>
         </div>
         <div class="stat">
           <span class="stat-number">100%</span>

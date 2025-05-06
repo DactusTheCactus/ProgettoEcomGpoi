@@ -13,16 +13,32 @@
   }
 
   $: total = $cartStore.reduce((sum, item) => sum + item.price, 0);
+  
+  // Add animation classes
+  let animatingOut = false;
+  
+  async function closeCartWithAnimation() {
+    animatingOut = true;
+    await new Promise(resolve => setTimeout(resolve, 300));
+    closeCart();
+    animatingOut = false;
+  }
 </script>
 
 {#if $cartOpen}
-  <div class="cart-overlay" on:click={closeCart}>
+  <div class="cart-overlay" class:animating-out={animatingOut} on:click={closeCartWithAnimation}>
     <div class="cart" on:click|stopPropagation>
-      <button class="close-btn" on:click={closeCart}>×</button>
-      <h2>Your Collection</h2>
+      <button class="close-btn" on:click={closeCartWithAnimation}>×</button>
+      <h2>La tua collezione di lusso</h2>
       
       {#if $cartStore.length === 0}
-        <p>Your collection is empty</p>
+        <div class="empty-cart">
+          <span class="empty-icon">👑</span>
+          <p>La tua collezzione sta aspettando il suo primo pezzo</p>
+          <button class="continue-shopping" on:click={closeCartWithAnimation}>
+            Continua a sfogliare
+          </button>
+        </div>
       {:else}
         <div class="cart-items">
           {#each $cartStore as item}
@@ -30,23 +46,29 @@
               <img src={item.imageUrl} alt={item.name} />
               <div class="item-details">
                 <h3>{item.name}</h3>
-                <p>${item.price}</p>
+                <p class="price">${item.price}</p>
+                <p class="description">{item.description}</p>
               </div>
-              <button class="remove-btn" on:click={() => removeFromCart(item)}>Remove</button>
+              <button class="remove-btn" on:click={() => removeFromCart(item)}>
+                <span class="remove-icon">×</span>
+              </button>
             </div>
           {/each}
-          }
         </div>
         <div class="cart-total">
-          <h3>Total: ${total}</h3>
-          <button class="checkout-btn">Proceed to Checkout</button>
+          <div class="total-row">
+            <span>Totale</span>
+            <span>${total}</span>
+          </div>
+          <button class="checkout-btn">
+            Procedi al Checkout
+            <span class="checkout-icon">→</span>
+          </button>
         </div>
       {/if}
-      }
     </div>
   </div>
 {/if}
-}
 
 <style>
   .cart-overlay {
@@ -55,66 +77,104 @@
     right: 0;
     bottom: 0;
     left: 0;
-    background: rgba(0, 0, 0, 0.3);
+    background: rgba(0, 0, 0, 0.8);
     display: flex;
     justify-content: flex-end;
     z-index: 1000;
-    backdrop-filter: blur(3px);
+    backdrop-filter: blur(8px);
+    animation: fadeIn 0.3s ease;
+  }
+
+  .cart-overlay.animating-out {
+    animation: fadeOut 0.3s ease;
   }
 
   .cart {
     width: 450px;
-    background-color:#2c3e50;
+    background-color: #111111;
     height: 100%;
     padding: 2rem;
     position: relative;
     overflow-y: auto;
-    box-shadow: -2px 0 20px rgba(0,0,0,0.1);
-    
+    box-shadow: -5px 0 30px rgba(0,0,0,0.5);
+    animation: slideIn 0.3s ease;
   }
 
   .close-btn {
     position: absolute;
     top: 1.5rem;
     right: 1.5rem;
-    font-size: 1.5em;
+    font-size: 2em;
     background: none;
     border: none;
     cursor: pointer;
-    color: #2c3e50;
+    color: #ffd700;
+    transition: transform 0.2s ease;
+  }
+
+  .close-btn:hover {
+    transform: rotate(90deg);
+    color: #ffffff;
   }
 
   .cart h2 {
-    color: rgb(247, 255, 5);
-    background-color:#2c3e50;
+    color: #ffd700;
     font-size: 1.8em;
     margin-bottom: 2rem;
-    font-family: Helvetica;
+    font-family: 'Playfair Display', serif;
+    border-bottom: 2px solid #333;
+    padding-bottom: 1rem;
   }
 
-  .cart-items {
-    margin-top: 1rem;
+  .empty-cart {
+    text-align: center;
+    padding: 3rem 0;
+    color: #666;
+  }
+
+  .empty-icon {
+    font-size: 3em;
+    display: block;
+    margin-bottom: 1rem;
+  }
+
+  .continue-shopping {
+    margin-top: 2rem;
+    background: #ffd700;
+    color: #000000;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 2px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+
+  .continue-shopping:hover {
+    background: #ffffff;
   }
 
   .cart-item {
     display: flex;
-    align-items: center;
-    padding: 1rem;
+    align-items: start;
+    padding: 1.5rem;
     margin-bottom: 1rem;
-    background-color:#2c3e50;
-    border-radius: 12px;
-    transition: transform 0.2s ease;
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 2px;
+    transition: all 0.3s ease;
   }
 
   .cart-item:hover {
+    border-color: #ffd700;
     transform: translateY(-2px);
   }
 
   .cart-item img {
-    width: 90px;
-    height: 90px;
+    width: 100px;
+    height: 100px;
     object-fit: cover;
-    border-radius: 8px;
+    border-radius: 2px;
   }
 
   .item-details {
@@ -124,51 +184,97 @@
 
   .item-details h3 {
     margin: 0;
-    color: #2c3e50;
+    color: #ffffff;
     font-size: 1.1em;
   }
 
-  .item-details p {
-    color: #166534;
+  .price {
+    color: #ffd700;
     font-weight: 600;
+    margin: 0.5rem 0;
+    font-size: 1.2em;
+  }
+
+  .description {
+    color: #888;
+    font-size: 0.9em;
     margin: 0.5rem 0;
   }
 
   .remove-btn {
-    padding: 0.5rem 1rem;
-    background: #fee2e2;
-    color: #dc2626;
+    background: none;
     border: none;
-    border-radius: 8px;
+    color: #666;
     cursor: pointer;
-    font-weight: 500;
-    transition: all 0.2s ease;
+    padding: 0.5rem;
+    transition: all 0.3s ease;
   }
 
   .remove-btn:hover {
-    background: #fecaca;
+    color: #ff4444;
+  }
+
+  .remove-icon {
+    font-size: 1.5em;
   }
 
   .cart-total {
     margin-top: 2rem;
     padding-top: 1rem;
-    border-top: 2px solid #f1f5f9;
+    border-top: 2px solid #333;
+  }
+
+  .total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #ffffff;
+    font-size: 1.2em;
+    margin-bottom: 1rem;
   }
 
   .checkout-btn {
-    background: #e3e611;
-    color: white;
+    background: #ffd700;
+    color: #000000;
     padding: 1rem 2rem;
     border: none;
-    border-radius: 8px;
+    border-radius: 2px;
     cursor: pointer;
     width: 100%;
     font-size: 1.1em;
-    font-weight: 500;
-    transition: background 0.2s ease;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    transition: all 0.3s ease;
   }
 
   .checkout-btn:hover {
-    background: #e3e611;
+    background: #ffffff;
+    transform: translateY(-2px);
+  }
+
+  .checkout-icon {
+    transition: transform 0.3s ease;
+  }
+
+  .checkout-btn:hover .checkout-icon {
+    transform: translateX(5px);
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+  }
+
+  @keyframes slideIn {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
   }
 </style>
