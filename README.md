@@ -78,7 +78,6 @@ Il frontend comunica con un backend Node.js/Express che:
 - Gestisce le richieste API per i prodotti
 - Integra Firebase Admin SDK
 - Gestisce autenticazione e autorizzazione
-- Fornisce endpoints RESTful
 
 L'API backend è configurata per girare sulla porta 3001 ed espone endpoints per:
 - Gestione prodotti
@@ -101,11 +100,3 @@ L'API backend è configurata per girare sulla porta 3001 ed espone endpoints per
 - **Errori TypeScript**: Verifica che tutte le definizioni dei tipi siano corrette
 - **Problemi Firebase**: Controlla le credenziali e le regole di sicurezza
 - **Errori di Build**: Assicurati che tutte le dipendenze siano installate correttamente
-
-## Contributing
-
-1. Fork il repository
-2. Crea un branch per la feature (`git checkout -b feature/AmazingFeature`)
-3. Commit i cambiamenti (`git commit -m 'Add some AmazingFeature'`)
-4. Push al branch (`git push origin feature/AmazingFeature`)
-5. Apri una Pull Request
