@@ -1,8 +1,7 @@
 <script lang="ts">
   import { cartStore, cartOpen } from './stores';
   import type { Product } from './types';
-  import { user } from './auth';
-
+  
 
   function removeFromCart(product: Product) {
     cartStore.update(items => items.filter(item => item.id !== product.id));

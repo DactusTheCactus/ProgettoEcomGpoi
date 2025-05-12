@@ -2,6 +2,8 @@
   import Router from 'svelte-spa-router';
   import Home from './routes/Home.svelte';
   import Cart from './lib/Cart.svelte';
+  import Auth from './lib/Auth.svelte';
+  import { userStore } from './lib/stores';
   import { cartOpen } from './lib/stores';
   
   const routes = {
@@ -11,18 +13,29 @@
   function toggleCart() {
     cartOpen.update(value => !value);
   }
+
+   let showLogin = false;
 </script>
+
 
 <nav>
   <div class="container">
     <div class="logo">Anzanation</div>
     <div class="nav-controls">
-      <button class="cart-button" on:click={toggleCart}>
-        Cart
-      </button>
+      {#if $userStore}
+        <button class="cart-button" on:click={toggleCart}>Cart</button>
+        <button on:click={() => userStore.set(null)}>Logout</button>
+      {:else}
+        <button on:click={() => showLogin = true}>Login</button>
+      {/if}
     </div>
   </div>
 </nav>
+
+
+{#if showLogin}
+  <Auth on:close={() => showLogin = false} />
+{/if}
 
 <main>
   <Router {routes} />

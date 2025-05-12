@@ -1,12 +1,13 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import type { Product } from '../lib/types';
-  import { cartStore, cartOpen } from '../lib/stores';
+  import { cartStore, cartOpen, userStore } from '../lib/stores';
 
   let products: Product[] = [];
   let loading = true;
   let categories: string[] = [];
   const API_URL = 'http://localhost:3001';
+
 
 
   onMount(async () => {
@@ -58,7 +59,13 @@
     loading = false;
   }
 });
-  function addToCart(product: Product) {
+
+  async function addToCart(product: Product) {
+    if (!$userStore) {
+      alert('Please login to add items to cart');
+      return;
+    }
+    
     cartStore.update(items => {
       const existingItem = items.find(item => item.id === product.id);
       if (!existingItem) {
@@ -67,6 +74,9 @@
       return items;
     });
     cartOpen.set(true);
+  }
+  function Login() {
+    
   }
 // Add random quotes
 const streetQuotes = [
@@ -137,7 +147,10 @@ let randomQuote = streetQuotes[Math.floor(Math.random() * streetQuotes.length)];
               <h3>{product.name}</h3>
               <p class="price">${product.price}</p>
               <p class="description">{product.description}</p>
-              <button class="add-to-cart" on:click={() => addToCart(product)}>
+              <button class="add-to-cart" on:click={() => addToCart(product)} class:disabled={!$userStore}> {$userStore ? 'Add to Collection' : 'Login to Add'}
+                Add to Collection
+              </button>
+              <button class="login-button" on:click={() => Login()}>
                 Add to Collection
               </button>
             </div>
