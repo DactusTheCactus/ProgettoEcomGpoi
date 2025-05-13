@@ -5,6 +5,7 @@
   import Auth from './lib/Auth.svelte';
   import { userStore } from './lib/stores';
   import { cartOpen } from './lib/stores';
+  import logoImage from './assets/logo.jpeg';
   
   const routes = {
    '/':Home
@@ -14,28 +15,38 @@
     cartOpen.update(value => !value);
   }
 
-   let showLogin = false;
+  let showAuth = false;
 </script>
 
 
 <nav>
   <div class="container">
+    <div class="logo-container">
+      <img 
+        src={logoImage}
+        alt="Logo" 
+        class="logo-image" 
+        class:spin={$userStore}
+      />
     <div class="logo">Anzanation</div>
-    <div class="nav-controls">
+    <div class="nav-controls" style="text-align: right;">
+      {#if $userStore}
+        <div class="user-email">Welcome, {$userStore.email.charAt(0).toUpperCase().concat($userStore.email.split('@')[0].slice(1,$userStore.email.length))}</div>
+      {/if}
       {#if $userStore}
         <button class="button-button" on:click={toggleCart}>Cart</button>
-        <button class="button-button" on:click={() => userStore.set(null)}>Logout</button>
+        <button class="button-button" on:click={() => showAuth = true}>Logout</button>
       {:else}
-        <button class = "button-button" on:click={() => showLogin = true}>Login</button>
+        <button class = "button-button" on:click={() => showAuth = true}>Login</button>
       {/if}
     </div>
   </div>
 </nav>
 
-
-{#if showLogin}
-  <Auth on:close={() => showLogin = false} />
-{/if}
+<Auth 
+    show={showAuth} 
+    on:close={() => showAuth = false}
+/>
 
 <main>
   <Router {routes} />
@@ -49,7 +60,7 @@
   :global(body) {  
     margin: 0;
     font-family: 'Playfair Display', serif;
-    background-color:#2c3e50;
+    background-color:rgb(17, 17, 17);
     color: #e3eaf0;
   }
 
@@ -97,5 +108,36 @@
   main {
     margin-top: 60px;
     min-height: calc(100vh - 60px);
+  }
+    .logo-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .logo-image {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .spin {
+    animation: spin 1s ease-in-out;
+  }
+
+  .nav-controls {
+    display: flex;
+    gap: 1rem;
+    margin-left: auto; 
+  }
+
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
   }
 </style>

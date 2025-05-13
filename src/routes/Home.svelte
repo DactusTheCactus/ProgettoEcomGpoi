@@ -3,6 +3,7 @@
   import type { Product } from '../lib/types';
   import { cartStore, cartOpen, userStore } from '../lib/stores';
 
+
   let products: Product[] = [];
   let loading = true;
   let categories: string[] = [];

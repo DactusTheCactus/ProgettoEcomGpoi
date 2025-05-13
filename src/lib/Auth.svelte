@@ -1,8 +1,13 @@
 <script lang="ts">
     import { userStore } from './stores';
     import { initializeApp } from 'firebase/app';
-    import { getAuth, signInWithEmailAndPassword, signOut } from 'firebase/auth';
-    
+    import { getAuth, signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword } from 'firebase/auth';
+    import { createEventDispatcher } from 'svelte';
+
+    export let show = false;
+
+    const dispatch = createEventDispatcher();
+
     // Firebase configuration
    const firebaseConfig = {
         apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -21,10 +26,10 @@
     let password = '';
     let error = '';
     let loading = false;
+    let isRegistering = false;
 
-    export let show = true; // Control modal visibility from parent
     function closeModal() {
-      show = false;
+        dispatch('close');
     }
 
 
@@ -46,9 +51,9 @@ async function handleLogin() {
       id: firebaseAuth.user.uid
     });
 
-    closeModal();
+    dispatch('close');
   } catch (e) {
-    error = e.message || 'Login failed. Please check your credentials.';
+    error = 'Login failed. Please check your credentials.';
   } finally {
     loading = false;
   }
@@ -59,8 +64,32 @@ async function handleLogout() {
     await signOut(auth);
   } finally {
     userStore.set(null);
-    closeModal();
+    dispatch('close');
   }
+}
+
+async function handleRegister() {
+    if (loading) return;
+    
+    loading = true;
+    error = '';
+    
+    try {
+        const firebaseAuth = await createUserWithEmailAndPassword(auth, email, password);
+        const token = await firebaseAuth.user.getIdToken();
+        
+        userStore.set({
+            email: firebaseAuth.user.email ?? '',
+            token: token,
+            id: firebaseAuth.user.uid
+        });
+
+        dispatch('close');
+    } catch (e) {
+        error = 'Registration failed. Please try a different email.';
+    } finally {
+        loading = false;
+    }
 }
 </script>
 
@@ -71,12 +100,12 @@ async function handleLogout() {
     <div class="auth-container" on:click|stopPropagation>
       {#if $userStore}
         <div class="user-info">
-          <p>Welcome, {$userStore.email}!</p>
+          <p>Sei sicuro di voler uscire, {$userStore.email}!</p>
           <button class="logout-btn" on:click={handleLogout}>Logout</button>
        </div>
       {:else}
-        <form on:submit|preventDefault={handleLogin} class="login-form">
-          <h2>Login</h2>
+        <form on:submit|preventDefault={isRegistering ? handleRegister : handleLogin} class="login-form">
+          <h2>{isRegistering ? 'Register' : 'Login'}</h2>
           <div class="form-group">
             <input 
               type="email" 
@@ -96,7 +125,10 @@ async function handleLogout() {
             />
           </div>
           <button type="submit" disabled={loading}>
-            {loading ? 'Logging in...' : 'Login'}
+            {loading ? (isRegistering ? 'Registering...' : 'Logging in...') : (isRegistering ? 'Register' : 'Login')}
+          </button>
+          <button type="button" class="switch-mode" on:click={() => { isRegistering = !isRegistering; error = ''; }}>
+            {isRegistering ? 'Già Un Anzalone? Login' : 'Non sei ancora un Anzalone? Registrati'}
           </button>
           {#if error}
             <p class="error">{error}</p>
@@ -189,5 +221,16 @@ async function handleLogout() {
   .logout-btn {
     background: #ff4444;
     color: white;
+  }
+
+  .switch-mode {
+    background: transparent;
+    color: #ffd700;
+    margin-top: 1rem;
+    font-size: 0.9em;
+  }
+  
+  .switch-mode:hover {
+    text-decoration: underline;
   }
 </style>
