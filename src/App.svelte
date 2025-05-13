@@ -23,10 +23,10 @@
     <div class="logo">Anzanation</div>
     <div class="nav-controls">
       {#if $userStore}
-        <button class="cart-button" on:click={toggleCart}>Cart</button>
-        <button on:click={() => userStore.set(null)}>Logout</button>
+        <button class="button-button" on:click={toggleCart}>Cart</button>
+        <button class="button-button" on:click={() => userStore.set(null)}>Logout</button>
       {:else}
-        <button on:click={() => showLogin = true}>Login</button>
+        <button class = "button-button" on:click={() => showLogin = true}>Login</button>
       {/if}
     </div>
   </div>
@@ -80,7 +80,7 @@
     
   }
 
-  .cart-button {
+  .button-button {
     padding: 0.5rem 1rem;
     background: hsl(61, 87%, 45%);
     color: #2c3e50;
@@ -88,12 +88,12 @@
     border-radius: 4px;
     cursor: pointer;
     font-family: Helvetica, serif;
+    font-weight: bold;
   }
 
-  .cart-button:hover {
+  .button-button:hover {
     background: hsl(61, 87%, 47%);
   }
-
   main {
     margin-top: 60px;
     min-height: calc(100vh - 60px);

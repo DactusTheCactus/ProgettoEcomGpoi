@@ -78,7 +78,7 @@
   function Login() {
     
   }
-// Add random quotes
+
 const streetQuotes = [
   "Everyday sto con i miei🗣️",
   "Everyday sono anzalone 👑",
@@ -93,7 +93,7 @@ let randomQuote = streetQuotes[Math.floor(Math.random() * streetQuotes.length)];
 <main class="dark-theme">
   <section class="hero">
     <div class="hero-content">
-      <div class="brand-tag">EST. 2024</div>
+      <div class="brand-tag">EST. 2021</div>
       <h1>Anzanation</h1>
       <p class="hero-subtitle">Anzanation: Lusso audace per chi traccia la propria strada.</p>
       <div class="street-quote">{randomQuote}</div>
@@ -119,7 +119,7 @@ let randomQuote = streetQuotes[Math.floor(Math.random() * streetQuotes.length)];
 
   <section class="products-section">
     {#if loading}
-      <div class="loading">Loading the excellence...</div>
+      <div class="loading">Caricando lo Stile...</div>
     {:else}
       <div class="filters">
         <h2 class="section-title">Categories</h2>
@@ -148,9 +148,6 @@ let randomQuote = streetQuotes[Math.floor(Math.random() * streetQuotes.length)];
               <p class="price">${product.price}</p>
               <p class="description">{product.description}</p>
               <button class="add-to-cart" on:click={() => addToCart(product)} class:disabled={!$userStore}> {$userStore ? 'Add to Collection' : 'Login to Add'}
-                Add to Collection
-              </button>
-              <button class="login-button" on:click={() => Login()}>
                 Add to Collection
               </button>
             </div>
