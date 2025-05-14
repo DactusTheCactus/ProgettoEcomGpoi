@@ -63,7 +63,7 @@
 
   async function addToCart(product: Product) {
     if (!$userStore) {
-      alert('Please login to add items to cart');
+      alert('Perfavore accedi per aggiungere al carrello');
       return;
     }
     
@@ -89,6 +89,20 @@ const streetQuotes = [
 ];
 
 let randomQuote = streetQuotes[Math.floor(Math.random() * streetQuotes.length)];
+
+// Category filter state
+let selectedCategory: string = 'All';
+
+// Filtered products derived from selectedCategory
+$: filteredProducts = selectedCategory === 'All'
+  ? products
+  : products.filter(product => product.category === selectedCategory);
+
+// Helper for image error
+function handleImgError(e: Event) {
+  const target = e.currentTarget as HTMLImageElement;
+  target.src = 'https://placehold.co/600x400/222/gold?text=Image+Not+Found';
+}
 </script>
 
 <main class="dark-theme">
@@ -125,31 +139,30 @@ let randomQuote = streetQuotes[Math.floor(Math.random() * streetQuotes.length)];
       <div class="filters">
         <h2 class="section-title">Categories</h2>
         <div class="filter-buttons">
+          <button class="filter-btn" on:click={() => selectedCategory = 'All'} class:active={selectedCategory === 'All'}>All</button>
           {#each categories as category}
-            <button class="filter-btn">{category}</button>
+            <button class="filter-btn" on:click={() => selectedCategory = category} class:active={selectedCategory === category}>{category}</button>
           {/each}
         </div>
       </div>
 
       <div class="products-grid">
-        {#each products as product}
+        {#each filteredProducts as product}
           <div class="product-card">
             <div class="product-image">
               <img
                 src={product.imageUrl}
                 alt={product.name}
                 loading="lazy"
-                on:error={(e) => {
-                  e.currentTarget.src = 'https://placehold.co/600x400/222/gold?text=Image+Not+Found';
-                }}
+                on:error={handleImgError}
               />
             </div>
             <div class="product-info">
               <h3>{product.name}</h3>
               <p class="price">${product.price}</p>
               <p class="description">{product.description}</p>
-              <button class="add-to-cart" on:click={() => addToCart(product)} class:disabled={!$userStore}> {$userStore ? 'Add to Collection' : 'Login to Add'}
-                Add to Collection
+              <button class="add-to-cart" on:click={() => addToCart(product)} disabled={!$userStore}>
+                {$userStore ? 'Add to Collection' : 'Effettua il Login'}
               </button>
             </div>
           </div>
@@ -200,6 +213,7 @@ let randomQuote = streetQuotes[Math.floor(Math.random() * streetQuotes.length)];
     margin: 0;
     background: linear-gradient(45deg, #ffd700, #ffffff);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     text-shadow: none;
   }
@@ -283,6 +297,13 @@ let randomQuote = streetQuotes[Math.floor(Math.random() * streetQuotes.length)];
   .filter-btn:hover {
     background: #ffd700;
     color: #000000;
+  }
+
+  .filter-btn.active {
+    background: #ffd700;
+    color: #000000;
+    font-weight: bold;
+    border: 2px solid #ffd700;
   }
 
   .products-grid {
@@ -375,10 +396,6 @@ let randomQuote = streetQuotes[Math.floor(Math.random() * streetQuotes.length)];
     .stats {
       flex-direction: column;
       gap: 2rem;
-    }
-
-    .product-overlay {
-      opacity: 1;
     }
   }
 </style>

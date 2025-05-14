@@ -22,6 +22,66 @@
     closeCart();
     animatingOut = false;
   }
+
+  let checkoutMode = false;
+  let paymentSuccess = false;
+  let paymentError = '';
+  let cardNumber = '';
+  let expiry = '';
+  let cvv = '';
+  let name = '';
+
+  function startCheckout() {
+    checkoutMode = true;
+    paymentSuccess = false;
+    paymentError = '';
+    cardNumber = '';
+    expiry = '';
+    cvv = '';
+    name = '';
+  }
+
+  function validatePayment() {
+    paymentError = '';
+    if (!/^\d{16}$/.test(cardNumber.replace(/\s+/g, ''))) {
+      paymentError = 'Numero carta non valido';
+      return false;
+    }
+    if (!/^\d{2}\/\d{2}$/.test(expiry)) {
+      paymentError = 'Data di scadenza non valida (MM/YY)';
+      return false;
+    }
+    // Check not expired
+    const [mm, yy] = expiry.split('/').map(Number);
+    const now = new Date();
+    const expDate = new Date(2000 + yy, mm);
+    if (expDate < now) {
+      paymentError = 'Carta scaduta';
+      return false;
+    }
+    if (!/^\d{3}$/.test(cvv)) {
+      paymentError = 'CVV non valido';
+      return false;
+    }
+    if (!name.trim()) {
+      paymentError = 'Nome richiesto';
+      return false;
+    }
+    return true;
+  }
+
+  async function submitPayment() {
+    if (!validatePayment()) return;
+    paymentError = '';
+    // Fake payment processing
+    await new Promise(r => setTimeout(r, 1200));
+    paymentSuccess = true;
+    cartStore.set([]);
+    setTimeout(() => {
+      checkoutMode = false;
+      closeCart();
+    }, 1800);
+  }
 </script>
 
 {#if $cartOpen}
@@ -39,31 +99,48 @@
           </button>
         </div>
       {:else}
-        <div class="cart-items">
-          {#each $cartStore as item}
-            <div class="cart-item">
-              <img src={item.imageUrl} alt={item.name} />
-              <div class="item-details">
-                <h3>{item.name}</h3>
-                <p class="price">${item.price}</p>
-                <p class="description">{item.description}</p>
+        {#if checkoutMode}
+          <form class="checkout-form" on:submit|preventDefault={submitPayment}>
+            <h3>Pagamento Mock</h3>
+            <input type="text" placeholder="Nome sulla carta" bind:value={name} required />
+            <input type="text" placeholder="Numero carta (16 cifre)" maxlength="19" bind:value={cardNumber} required />
+            <input type="text" placeholder="MM/YY" maxlength="5" bind:value={expiry} required />
+            <input type="text" placeholder="CVV" maxlength="3" bind:value={cvv} required />
+            {#if paymentError}
+              <div class="payment-error">{paymentError}</div>
+            {/if}
+            <button class="checkout-btn" type="submit">Paga ora</button>
+            {#if paymentSuccess}
+              <div class="payment-success">Pagamento riuscito! 👑</div>
+            {/if}
+          </form>
+        {:else}
+          <div class="cart-items">
+            {#each $cartStore as item}
+              <div class="cart-item">
+                <img src={item.imageUrl} alt={item.name} />
+                <div class="item-details">
+                  <h3>{item.name}</h3>
+                  <p class="price">${item.price}</p>
+                  <p class="description">{item.description}</p>
+                </div>
+                <button class="remove-btn" on:click={() => removeFromCart(item)}>
+                  <span class="remove-icon">×</span>
+                </button>
               </div>
-              <button class="remove-btn" on:click={() => removeFromCart(item)}>
-                <span class="remove-icon">×</span>
-              </button>
-            </div>
-          {/each}
-        </div>
-        <div class="cart-total">
-          <div class="total-row">
-            <span>Totale</span>
-            <span>${total}</span>
+            {/each}
           </div>
-          <button class="checkout-btn">
-            Procedi al Checkout
-            <span class="checkout-icon">→</span>
-          </button>
-        </div>
+          <div class="cart-total">
+            <div class="total-row">
+              <span>Totale</span>
+              <span>${total}</span>
+            </div>
+            <button class="checkout-btn" on:click={startCheckout}>
+              Procedi al Checkout
+              <span class="checkout-icon">→</span>
+            </button>
+          </div>
+        {/if}
       {/if}
     </div>
   </div>
@@ -275,5 +352,47 @@
   @keyframes slideIn {
     from { transform: translateX(100%); }
     to { transform: translateX(0); }
+  }
+
+  .checkout-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    background: #181818;
+    padding: 2rem;
+    border-radius: 4px;
+    margin-top: 2rem;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+  }
+  .checkout-form input {
+    padding: 0.8rem;
+    border: 1px solid #333;
+    border-radius: 2px;
+    background: #222;
+    color: #ffd700;
+    font-size: 1em;
+  }
+  .checkout-form input:focus {
+    outline: none;
+    border-color: #ffd700;
+  }
+  .payment-error {
+    color: #ff4444;
+    background: #2a0000;
+    padding: 0.5rem 1rem;
+    border-radius: 2px;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+    text-align: center;
+  }
+  .payment-success {
+    color: #00c853;
+    background: #002a12;
+    padding: 0.5rem 1rem;
+    border-radius: 2px;
+    margin-top: 1rem;
+    font-weight: bold;
+    text-align: center;
+    font-size: 1.2em;
   }
 </style>
